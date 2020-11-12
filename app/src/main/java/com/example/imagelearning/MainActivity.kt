@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraSelector
@@ -21,7 +20,6 @@ import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 
 private const val PERMISSIONS_REQUEST_CODE = 10
 private val PERMISSIONS_REQUIRED = arrayOf(Manifest.permission.CAMERA)
-private val TAG = MainActivity.javaClass.simpleName
 
 class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
@@ -85,7 +83,6 @@ class MainActivity : AppCompatActivity(), CameraXConfig.Provider {
     }
 
     companion object {
-
         /** Convenience method used to check if all permissions required by this app are granted */
         fun hasPermissions(context: Context) = PERMISSIONS_REQUIRED.all {
             ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
