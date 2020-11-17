@@ -1,4 +1,4 @@
-package com.example.imagelearning
+package com.example.imagelearning.processors
 
 import android.app.ActivityManager
 import android.content.Context
@@ -11,6 +11,13 @@ import android.util.Log
 import android.widget.Toast
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
+import com.example.imagelearning.utils.FrameMetadata
+import com.example.imagelearning.utils.ScopedExecutor
+import com.example.imagelearning.graphics.CameraImageGraphic
+import com.example.imagelearning.graphics.GraphicOverlay
+import com.example.imagelearning.graphics.InferenceInfoGraphic
+import com.example.imagelearning.utils.BitmapUtils
+import com.example.imagelearning.utils.PreferenceUtils
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskExecutors
 import com.google.mlkit.vision.common.InputImage
@@ -109,10 +116,10 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
 
     // -----------------Common processing logic-------------------------------------------------------
     private fun requestDetectInImage(
-        image: InputImage,
-        graphicOverlay: GraphicOverlay,
-        originalCameraImage: Bitmap?,
-        shouldShowFps: Boolean
+            image: InputImage,
+            graphicOverlay: GraphicOverlay,
+            originalCameraImage: Bitmap?,
+            shouldShowFps: Boolean
     ): Task<T> {
         val startMs = SystemClock.elapsedRealtime()
         return detectInImage(image).addOnSuccessListener(executor) { results: T ->

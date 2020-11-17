@@ -1,4 +1,4 @@
-package com.example.imagelearning;
+package com.example.imagelearning.utils;
 
 /** Describing a frame info. */
 public class FrameMetadata {

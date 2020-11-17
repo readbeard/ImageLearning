@@ -1,14 +1,13 @@
 package com.example.imagelearning
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -16,10 +15,13 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.example.imagelearning.graphics.GraphicOverlay
+import com.example.imagelearning.processors.ObjectDetectorProcessor
+import com.example.imagelearning.processors.VisionImageProcessor
+import com.example.imagelearning.utils.PreferenceUtils
+import com.example.imagelearning.viewmodels.CameraXViewModel
 import com.google.mlkit.common.MlKitException
 import com.google.mlkit.common.model.LocalModel
-import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
-import com.google.mlkit.vision.objects.ObjectDetection
 
 class MainActivity : AppCompatActivity(),
     ActivityCompat.OnRequestPermissionsResultCallback,
@@ -206,7 +208,7 @@ class MainActivity : AppCompatActivity(),
                         "Using Custom Object Detector (Bird) Processor"
                     )
                     val localModel = LocalModel.Builder()
-                        .setAssetFilePath("custom_models/custom_model.tflite") //TODO: put here the model!
+                        .setAssetFilePath("custom_models/generic_object_detection.tflite") //TODO: put here the model!
                         .build()
                     val customObjectDetectorOptions =
                         PreferenceUtils.getCustomObjectDetectorOptionsForLivePreview(

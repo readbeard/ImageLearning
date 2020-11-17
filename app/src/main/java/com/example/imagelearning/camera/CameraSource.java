@@ -1,4 +1,4 @@
-package com.example.imagelearning;
+package com.example.imagelearning.camera;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -14,6 +14,10 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
+import com.example.imagelearning.graphics.GraphicOverlay;
+import com.example.imagelearning.processors.VisionImageProcessor;
+import com.example.imagelearning.utils.FrameMetadata;
+import com.example.imagelearning.utils.PreferenceUtils;
 import com.google.android.gms.common.images.Size;
 import java.io.IOException;
 import java.lang.Thread.State;
@@ -40,14 +44,14 @@ public class CameraSource {
 
     private static final String TAG = CameraSource.class.getSimpleName();
 
-    /**
+    /*
      * The dummy surface texture must be assigned a chosen name. Since we never use an OpenGL context,
      * we can choose any ID we want here. The dummy surface texture is not a crazy hack - it is
      * actually how the camera team recommends using the camera without a preview.
      */
     private static final int DUMMY_TEXTURE_NAME = 100;
 
-    /**
+    /*
      * If the absolute difference between a preview size aspect ratio and a picture size aspect ratio
      * is less than this tolerance, they are considered to be the same aspect ratio.
      */
@@ -59,7 +63,7 @@ public class CameraSource {
 
     private int facing = CAMERA_FACING_BACK;
 
-    /** Rotation of the device, and thus the associated preview images captured from the device. */
+    /* Rotation of the device, and thus the associated preview images captured from the device. */
     private int rotationDegrees;
 
     private Size previewSize;
@@ -80,23 +84,18 @@ public class CameraSource {
     // want to display a preview we use a SurfaceTexture if we are running at least Honeycomb.
     private boolean usingSurfaceTexture;
 
-    /**
-     * Dedicated thread and associated runnable for calling into the detector with frames, as the
-     * frames become available from the camera.
-     */
-    private Thread processingThread;
-
-    private final FrameProcessingRunnable processingRunnable;
-    private final Object processorLock = new Object();
+    private Thread detectorProcessingThread;
+    private final FrameProcessingRunnable detectorProcessingRunnable;
+    private final Object detectorProcessingLock = new Object();
 
     private VisionImageProcessor frameProcessor;
 
-    /**
+    /*
      * Map to convert between a byte array, received from the camera, and its associated byte buffer.
      * We use byte buffers internally because this is a more efficient way to call into native code
      * later (avoids a potential copy).
      *
-     * <p><b>Note:</b> uses IdentityHashMap here instead of HashMap because the behavior of an array's
+     * Note: uses IdentityHashMap here instead of HashMap because the behavior of an array's
      * equals, hashCode and toString methods is both useless and unexpected. IdentityHashMap enforces
      * identity ('==') check on the keys.
      */
@@ -106,18 +105,14 @@ public class CameraSource {
         this.activity = activity;
         graphicOverlay = overlay;
         graphicOverlay.clear();
-        processingRunnable = new FrameProcessingRunnable();
+        detectorProcessingRunnable = new FrameProcessingRunnable();
     }
-
-    // ==============================================================================================
-    // Public
-    // ==============================================================================================
 
     /** Stops the camera and releases the resources of the camera and underlying detector. */
     public void release() {
-        synchronized (processorLock) {
+        synchronized (detectorProcessingLock) {
             stop();
-            processingRunnable.release();
+            detectorProcessingRunnable.release();
             cleanScreen();
 
             if (frameProcessor != null) {
@@ -144,9 +139,9 @@ public class CameraSource {
         usingSurfaceTexture = true;
         camera.startPreview();
 
-        processingThread = new Thread(processingRunnable);
-        processingRunnable.setActive(true);
-        processingThread.start();
+        detectorProcessingThread = new Thread(detectorProcessingRunnable);
+        detectorProcessingRunnable.setActive(true);
+        detectorProcessingThread.start();
         return this;
     }
 
@@ -167,9 +162,9 @@ public class CameraSource {
         camera.setPreviewDisplay(surfaceHolder);
         camera.startPreview();
 
-        processingThread = new Thread(processingRunnable);
-        processingRunnable.setActive(true);
-        processingThread.start();
+        detectorProcessingThread = new Thread(detectorProcessingRunnable);
+        detectorProcessingRunnable.setActive(true);
+        detectorProcessingThread.start();
 
         usingSurfaceTexture = false;
         return this;
@@ -185,17 +180,17 @@ public class CameraSource {
      * resources of the underlying detector.
      */
     public synchronized void stop() {
-        processingRunnable.setActive(false);
-        if (processingThread != null) {
+        detectorProcessingRunnable.setActive(false);
+        if (detectorProcessingThread != null) {
             try {
                 // Wait for the thread to complete to ensure that we can't have multiple threads
                 // executing at the same time (i.e., which would happen if we called start too
                 // quickly after stop).
-                processingThread.join();
+                detectorProcessingThread.join();
             } catch (InterruptedException e) {
                 Log.d(TAG, "Frame processing thread interrupted on release.");
             }
-            processingThread = null;
+            detectorProcessingThread = null;
         }
 
         if (camera != null) {
@@ -553,12 +548,12 @@ public class CameraSource {
     private class CameraPreviewCallback implements Camera.PreviewCallback {
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
-            processingRunnable.setNextFrame(data, camera);
+            detectorProcessingRunnable.setNextFrame(data, camera);
         }
     }
 
     public void setMachineLearningFrameProcessor(VisionImageProcessor processor) {
-        synchronized (processorLock) {
+        synchronized (detectorProcessingLock) {
             cleanScreen();
             if (frameProcessor != null) {
                 frameProcessor.stop();
@@ -594,7 +589,7 @@ public class CameraSource {
          */
         @SuppressLint("Assert")
         void release() {
-            assert (processingThread.getState() == State.TERMINATED);
+            assert (detectorProcessingThread.getState() == State.TERMINATED);
         }
 
         /** Marks the runnable as active/not active. Signals any blocked threads to continue. */
@@ -684,7 +679,7 @@ public class CameraSource {
                 // frame.
 
                 try {
-                    synchronized (processorLock) {
+                    synchronized (detectorProcessingLock) {
                         frameProcessor.processByteBuffer(
                                 data,
                                 new FrameMetadata.Builder()

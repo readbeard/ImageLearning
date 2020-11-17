@@ -1,17 +1,15 @@
-package com.example.imagelearning
+package com.example.imagelearning.graphics
 
 import android.graphics.*
-import android.util.Log
 import com.google.mlkit.vision.objects.DetectedObject
-import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
 /** Draw the detected object info in preview.  */
 class ObjectGraphic constructor(
-    overlay: GraphicOverlay,
-    private val detectedObject: DetectedObject
+        overlay: GraphicOverlay,
+        private val detectedObject: DetectedObject
 ) : GraphicOverlay.Graphic(overlay) {
 
     private val numColors = COLORS.size

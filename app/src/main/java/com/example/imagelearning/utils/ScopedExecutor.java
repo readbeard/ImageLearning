@@ -1,4 +1,4 @@
-package com.example.imagelearning;
+package com.example.imagelearning.utils;
 
 import androidx.annotation.NonNull;
 import java.util.concurrent.Executor;

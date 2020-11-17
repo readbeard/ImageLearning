@@ -1,4 +1,4 @@
-package com.example.imagelearning;
+package com.example.imagelearning.utils;
 
 import android.annotation.TargetApi;
 import android.content.ContentResolver;

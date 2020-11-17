@@ -1,4 +1,4 @@
-package com.example.imagelearning;
+package com.example.imagelearning.viewmodels;
 
 import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;

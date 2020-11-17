@@ -1,13 +1,15 @@
-package com.example.imagelearning;
+package com.example.imagelearning.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build.VERSION_CODES;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
+import com.example.imagelearning.camera.CameraSource;
+import com.example.imagelearning.camera.CameraSource.SizePair;
+import com.example.imagelearning.R;
 import com.google.android.gms.common.images.Size;
 import com.google.common.base.Preconditions;
 import com.google.mlkit.common.model.LocalModel;
@@ -28,7 +30,7 @@ public class PreferenceUtils {
     }
 
     @Nullable
-    public static CameraSource.SizePair getCameraPreviewSizePair(Context context, int cameraId) {
+    public static SizePair getCameraPreviewSizePair(Context context, int cameraId) {
         Preconditions.checkArgument(
                 cameraId == CameraSource.CAMERA_FACING_BACK
                         || cameraId == CameraSource.CAMERA_FACING_FRONT);

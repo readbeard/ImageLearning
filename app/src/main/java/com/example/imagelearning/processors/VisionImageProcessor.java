@@ -1,9 +1,11 @@
-package com.example.imagelearning;
+package com.example.imagelearning.processors;
 
 import android.graphics.Bitmap;
 import android.os.Build.VERSION_CODES;
 import androidx.annotation.RequiresApi;
 import androidx.camera.core.ImageProxy;
+import com.example.imagelearning.utils.FrameMetadata;
+import com.example.imagelearning.graphics.GraphicOverlay;
 import com.google.mlkit.common.MlKitException;
 import java.nio.ByteBuffer;
 
