@@ -24,9 +24,9 @@ import com.google.mlkit.common.MlKitException
 import com.google.mlkit.common.model.LocalModel
 
 class MainActivity : AppCompatActivity(),
-    ActivityCompat.OnRequestPermissionsResultCallback,
-    AdapterView.OnItemSelectedListener,
-    CompoundButton.OnCheckedChangeListener {
+        ActivityCompat.OnRequestPermissionsResultCallback,
+        AdapterView.OnItemSelectedListener,
+        CompoundButton.OnCheckedChangeListener {
 
     private var previewView: PreviewView? = null
     private var graphicOverlay: GraphicOverlay? = null
@@ -43,15 +43,15 @@ class MainActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         if (savedInstanceState != null) {
             selectedModel =
-                savedInstanceState.getString(
-                    STATE_SELECTED_MODEL,
-                    OBJECT_DETECTION_CUSTOM
-                )
+                    savedInstanceState.getString(
+                            STATE_SELECTED_MODEL,
+                            OBJECT_DETECTION_CUSTOM
+                    )
             lensFacing =
-                savedInstanceState.getInt(
-                    STATE_LENS_FACING,
-                    CameraSelector.LENS_FACING_BACK
-                )
+                    savedInstanceState.getInt(
+                            STATE_LENS_FACING,
+                            CameraSelector.LENS_FACING_BACK
+                    )
         }
         cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
         setContentView(R.layout.activity_main)
@@ -73,20 +73,20 @@ class MainActivity : AppCompatActivity(),
         val facingSwitch = findViewById<ToggleButton>(R.id.facing_switch)
         facingSwitch.setOnCheckedChangeListener(this)
         ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-        )
-            .get(CameraXViewModel::class.java)
-            .processCameraProvider
-            .observe(
                 this,
-                Observer { provider: ProcessCameraProvider? ->
-                    cameraProvider = provider
-                    if (allPermissionsGranted()) {
-                        bindAllCameraUseCases()
-                    }
-                }
-            )
+                ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+        )
+                .get(CameraXViewModel::class.java)
+                .processCameraProvider
+                .observe(
+                        this,
+                        Observer { provider: ProcessCameraProvider? ->
+                            cameraProvider = provider
+                            if (allPermissionsGranted()) {
+                                bindAllCameraUseCases()
+                            }
+                        }
+                )
 
         if (!allPermissionsGranted()) {
             runtimePermissions
@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity(),
             CameraSelector.LENS_FACING_FRONT
         }
         val newCameraSelector =
-            CameraSelector.Builder().requireLensFacing(newLensFacing).build()
+                CameraSelector.Builder().requireLensFacing(newLensFacing).build()
         try {
             if (cameraProvider!!.hasCamera(newCameraSelector)) {
                 lensFacing = newLensFacing
@@ -135,10 +135,10 @@ class MainActivity : AppCompatActivity(),
             // Falls through
         }
         Toast.makeText(
-            applicationContext, "This device does not have lens with facing: $newLensFacing",
-            Toast.LENGTH_SHORT
+                applicationContext, "This device does not have lens with facing: $newLensFacing",
+                Toast.LENGTH_SHORT
         )
-            .show()
+                .show()
     }
 
     public override fun onResume() {
@@ -184,8 +184,8 @@ class MainActivity : AppCompatActivity(),
         previewUseCase = Preview.Builder().build()
         previewUseCase!!.setSurfaceProvider(previewView!!.surfaceProvider)
         cameraProvider!!.bindToLifecycle(/* lifecycleOwner= */this,
-            cameraSelector!!,
-            previewUseCase
+                cameraSelector!!,
+                previewUseCase
         )
     }
 
@@ -204,35 +204,35 @@ class MainActivity : AppCompatActivity(),
             when (selectedModel) {
                 OBJECT_DETECTION_CUSTOM -> {
                     Log.i(
-                        TAG,
-                        "Using Custom Object Detector (Bird) Processor"
+                            TAG,
+                            "Using Custom Object Detector (Bird) Processor"
                     )
                     val localModel = LocalModel.Builder()
-                        .setAssetFilePath("custom_models/generic_object_detection.tflite") //TODO: put here the model!
-                        .build()
+                            .setAssetFilePath("custom_models/generic_object_detection.tflite") //TODO: put here the model!
+                            .build()
                     val customObjectDetectorOptions =
-                        PreferenceUtils.getCustomObjectDetectorOptionsForLivePreview(
-                            this,
-                            localModel
-                        )
+                            PreferenceUtils.getCustomObjectDetectorOptionsForLivePreview(
+                                    this,
+                                    localModel
+                            )
                     ObjectDetectorProcessor(
-                        this, customObjectDetectorOptions
+                            this, customObjectDetectorOptions
                     )
                 }
                 else -> return //TODO: what is going on here?
             }
         } catch (e: Exception) {
             Log.e(
-                TAG,
-                "Can not create image processor: $selectedModel",
-                e
+                    TAG,
+                    "Can not create image processor: $selectedModel",
+                    e
             )
             Toast.makeText(
-                applicationContext,
-                "Can not create image processor: " + e.localizedMessage,
-                Toast.LENGTH_LONG
+                    applicationContext,
+                    "Can not create image processor: " + e.localizedMessage,
+                    Toast.LENGTH_LONG
             )
-                .show()
+                    .show()
             return
         }
 
@@ -247,52 +247,52 @@ class MainActivity : AppCompatActivity(),
         needUpdateGraphicOverlayImageSourceInfo = true
 
         analysisUseCase?.setAnalyzer(
-            // imageProcessor.processImageProxy will use another thread to run the detection underneath,
-            // thus we can just run the analyzer itself on main thread.
-            ContextCompat.getMainExecutor(this),
-            ImageAnalysis.Analyzer { imageProxy: ImageProxy ->
-                if (needUpdateGraphicOverlayImageSourceInfo) {
-                    val isImageFlipped =
-                        lensFacing == CameraSelector.LENS_FACING_FRONT
-                    val rotationDegrees =
-                        imageProxy.imageInfo.rotationDegrees
-                    if (rotationDegrees == 0 || rotationDegrees == 180) {
-                        graphicOverlay!!.setImageSourceInfo(
-                            imageProxy.width, imageProxy.height, isImageFlipped
-                        )
-                    } else {
-                        graphicOverlay!!.setImageSourceInfo(
-                            imageProxy.height, imageProxy.width, isImageFlipped
-                        )
+                // imageProcessor.processImageProxy will use another thread to run the detection underneath,
+                // thus we can just run the analyzer itself on main thread.
+                ContextCompat.getMainExecutor(this),
+                ImageAnalysis.Analyzer { imageProxy: ImageProxy ->
+                    if (needUpdateGraphicOverlayImageSourceInfo) {
+                        val isImageFlipped =
+                                lensFacing == CameraSelector.LENS_FACING_FRONT
+                        val rotationDegrees =
+                                imageProxy.imageInfo.rotationDegrees
+                        if (rotationDegrees == 0 || rotationDegrees == 180) {
+                            graphicOverlay!!.setImageSourceInfo(
+                                    imageProxy.width, imageProxy.height, isImageFlipped
+                            )
+                        } else {
+                            graphicOverlay!!.setImageSourceInfo(
+                                    imageProxy.height, imageProxy.width, isImageFlipped
+                            )
+                        }
+                        needUpdateGraphicOverlayImageSourceInfo = false
                     }
-                    needUpdateGraphicOverlayImageSourceInfo = false
+                    try {
+                        imageProcessor!!.processImageProxy(imageProxy, graphicOverlay)
+                    } catch (e: MlKitException) {
+                        Log.e(
+                                TAG,
+                                "Failed to process image. Error: " + e.localizedMessage
+                        )
+                        Toast.makeText(
+                                applicationContext,
+                                e.localizedMessage,
+                                Toast.LENGTH_SHORT
+                        )
+                                .show()
+                    }
                 }
-                try {
-                    imageProcessor!!.processImageProxy(imageProxy, graphicOverlay)
-                } catch (e: MlKitException) {
-                    Log.e(
-                        TAG,
-                        "Failed to process image. Error: " + e.localizedMessage
-                    )
-                    Toast.makeText(
-                        applicationContext,
-                        e.localizedMessage,
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                }
-            }
         )
         cameraProvider!!.bindToLifecycle( /* lifecycleOwner= */this,
-            cameraSelector!!,
-            analysisUseCase
+                cameraSelector!!,
+                analysisUseCase
         )
     }
 
     private val requiredPermissions: Array<String?>
         get() = try {
             val info = this.packageManager
-                .getPackageInfo(this.packageName, PackageManager.GET_PERMISSIONS)
+                    .getPackageInfo(this.packageName, PackageManager.GET_PERMISSIONS)
             val ps = info.requestedPermissions
             if (ps != null && ps.isNotEmpty()) {
                 ps
@@ -322,17 +322,17 @@ class MainActivity : AppCompatActivity(),
             }
             if (allNeededPermissions.isNotEmpty()) {
                 ActivityCompat.requestPermissions(
-                    this,
-                    allNeededPermissions.toTypedArray(),
-                    PERMISSION_REQUESTS
+                        this,
+                        allNeededPermissions.toTypedArray(),
+                        PERMISSION_REQUESTS
                 )
             }
         }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
+            requestCode: Int,
+            permissions: Array<String>,
+            grantResults: IntArray
     ) {
         Log.i(TAG, "Permission granted!")
         if (allPermissionsGranted()) {
@@ -349,11 +349,11 @@ class MainActivity : AppCompatActivity(),
         private const val STATE_LENS_FACING = "lens_facing"
 
         private fun isPermissionGranted(
-            context: Context,
-            permission: String?
+                context: Context,
+                permission: String?
         ): Boolean {
             if (ContextCompat.checkSelfPermission(context, permission!!)
-                == PackageManager.PERMISSION_GRANTED
+                    == PackageManager.PERMISSION_GRANTED
             ) {
                 Log.i(TAG, "Permission granted: $permission")
                 return true

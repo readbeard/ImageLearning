@@ -36,11 +36,11 @@ class ObjectGraphic constructor(
     override fun draw(canvas: Canvas) {
         // Decide color based on object tracking ID
         val colorID =
-            if (detectedObject.trackingId == null) 0
-            else abs(detectedObject.trackingId!! % NUM_COLORS)
+                if (detectedObject.trackingId == null) 0
+                else abs(detectedObject.trackingId!! % NUM_COLORS)
         val mostConfidentResult = detectedObject.labels[0].text
         val textWidth =
-            textPaints[colorID].measureText(mostConfidentResult)
+                textPaints[colorID].measureText(mostConfidentResult)
         val lineHeight = TEXT_SIZE + STROKE_WIDTH
         var yLabelOffset = -lineHeight
 
@@ -56,11 +56,11 @@ class ObjectGraphic constructor(
 
         // Draws other object info.
         canvas.drawRect(
-            rect.left - STROKE_WIDTH,
-            rect.top + yLabelOffset,
-            rect.left + textWidth + 2 * STROKE_WIDTH,
-            rect.top,
-            labelPaints[colorID]
+                rect.left - STROKE_WIDTH,
+                rect.top + yLabelOffset,
+                rect.left + textWidth + 2 * STROKE_WIDTH,
+                rect.top,
+                labelPaints[colorID]
         )
         yLabelOffset += TEXT_SIZE
         canvas.drawText(
@@ -83,20 +83,20 @@ class ObjectGraphic constructor(
         private const val STROKE_WIDTH = 4.0f
         private const val NUM_COLORS = 10
         private val COLORS =
-            arrayOf(
-                intArrayOf(Color.BLACK, Color.WHITE),
-                intArrayOf(Color.WHITE, Color.MAGENTA),
-                intArrayOf(Color.BLACK, Color.LTGRAY),
-                intArrayOf(Color.WHITE, Color.RED),
-                intArrayOf(Color.WHITE, Color.BLUE),
-                intArrayOf(Color.WHITE, Color.DKGRAY),
-                intArrayOf(Color.BLACK, Color.CYAN),
-                intArrayOf(Color.BLACK, Color.YELLOW),
-                intArrayOf(Color.WHITE, Color.BLACK),
-                intArrayOf(Color.BLACK, Color.GREEN)
-            )
+                arrayOf(
+                        intArrayOf(Color.BLACK, Color.WHITE),
+                        intArrayOf(Color.WHITE, Color.MAGENTA),
+                        intArrayOf(Color.BLACK, Color.LTGRAY),
+                        intArrayOf(Color.WHITE, Color.RED),
+                        intArrayOf(Color.WHITE, Color.BLUE),
+                        intArrayOf(Color.WHITE, Color.DKGRAY),
+                        intArrayOf(Color.BLACK, Color.CYAN),
+                        intArrayOf(Color.BLACK, Color.YELLOW),
+                        intArrayOf(Color.WHITE, Color.BLACK),
+                        intArrayOf(Color.BLACK, Color.GREEN)
+                )
 
         private val TAG = ObjectGraphic::class.simpleName
-        private lateinit var rect : RectF
+        private lateinit var rect: RectF
     }
 }

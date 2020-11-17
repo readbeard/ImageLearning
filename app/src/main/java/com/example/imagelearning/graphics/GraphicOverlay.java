@@ -11,13 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A view which renders a series of custom graphics to be overlayed on top of an associated preview
- * (i.e., the camera preview). The creator can add graphics objects, update the objects, and remove
- * them, triggering the appropriate drawing and invalidation within the view.
+ * A view which renders a series of custom graphics to be overlayed on top of an associated preview (i.e., the camera preview).
+ * The creator can add graphics objects, update the objects, and remove them, triggering the appropriate drawing and invalidation
+ * within the view.
  *
  * <p>Supports scaling and mirroring of the graphics relative the camera's preview properties. The
- * idea is that detection items are expressed in terms of an image size, but need to be scaled up
- * to the full view size, and also mirrored in the case of the front-facing camera.
+ * idea is that detection items are expressed in terms of an image size, but need to be scaled up to the full view size, and also
+ * mirrored in the case of the front-facing camera.
  *
  * <p>Associated {@link Graphic} items should use the following methods to convert to view
  * coordinates for the graphics that are drawn:
@@ -30,211 +30,224 @@ import java.util.List;
  * </ol>
  */
 public class GraphicOverlay extends View {
-    private static final String TAG = GraphicOverlay.class.getSimpleName();
 
-    private final Object lock = new Object();
-    private final List<Graphic> graphics = new ArrayList<>();
-    // Matrix for transforming from image coordinates to overlay view coordinates.
-    private final Matrix transformationMatrix = new Matrix();
+	private static final String TAG = GraphicOverlay.class.getSimpleName();
 
-    private int imageWidth;
-    private int imageHeight;
-    // The factor of overlay View size to image size. Anything in the image coordinates need to be
-    // scaled by this amount to fit with the area of overlay View.
-    private float scaleFactor = 1.0f;
-    // The number of horizontal pixels needed to be cropped on each side to fit the image with the
-    // area of overlay View after scaling.
-    private float postScaleWidthOffset;
-    // The number of vertical pixels needed to be cropped on each side to fit the image with the
-    // area of overlay View after scaling.
-    private float postScaleHeightOffset;
-    private boolean isImageFlipped;
-    private boolean needUpdateTransformation = true;
+	private final Object lock = new Object();
+	private final List<Graphic> graphics = new ArrayList<>();
+	// Matrix for transforming from image coordinates to overlay view coordinates.
+	private final Matrix transformationMatrix = new Matrix();
 
-    /**
-     * Base class for a custom graphics object to be rendered within the graphic overlay. Subclass
-     * this and implement the {@link Graphic#draw(Canvas)} method to define the graphics element. Add
-     * instances to the overlay using {@link GraphicOverlay#add(Graphic)}.
-     */
-    public abstract static class Graphic {
-        private GraphicOverlay overlay;
+	private int imageWidth;
+	private int imageHeight;
+	// The factor of overlay View size to image size. Anything in the image coordinates need to be
+	// scaled by this amount to fit with the area of overlay View.
+	private float scaleFactor = 1.0f;
+	// The number of horizontal pixels needed to be cropped on each side to fit the image with the
+	// area of overlay View after scaling.
+	private float postScaleWidthOffset;
+	// The number of vertical pixels needed to be cropped on each side to fit the image with the
+	// area of overlay View after scaling.
+	private float postScaleHeightOffset;
+	private boolean isImageFlipped;
+	private boolean needUpdateTransformation = true;
 
-        public Graphic(GraphicOverlay overlay) {
-            this.overlay = overlay;
-        }
+	/**
+	 * Base class for a custom graphics object to be rendered within the graphic overlay. Subclass this and implement the {@link
+	 * Graphic#draw(Canvas)} method to define the graphics element. Add instances to the overlay using {@link
+	 * GraphicOverlay#add(Graphic)}.
+	 */
+	public abstract static class Graphic {
 
-        /**
-         * Draw the graphic on the supplied canvas. Drawing should use the following methods to convert
-         * to view coordinates for the graphics that are drawn:
-         *
-         * <ol>
-         *   <li>{@link Graphic#scale(float)} adjusts the size of the supplied value from the image
-         *       scale to the view scale.
-         *   <li>{@link Graphic#translateX(float)} and {@link Graphic#translateY(float)} adjust the
-         *       coordinate from the image's coordinate system to the view coordinate system.
-         * </ol>
-         *
-         * @param canvas drawing canvas
-         */
-        public abstract void draw(Canvas canvas);
+		private GraphicOverlay overlay;
 
-        public abstract void onTouch(Float x, Float y);
+		public Graphic(GraphicOverlay overlay) {
+			this.overlay = overlay;
+		}
 
-        /** Adjusts the supplied value from the image scale to the view scale. */
-        public float scale(float imagePixel) {
-            return imagePixel * overlay.scaleFactor;
-        }
+		/**
+		 * Draw the graphic on the supplied canvas. Drawing should use the following methods to convert to view coordinates for
+		 * the graphics that are drawn:
+		 *
+		 * <ol>
+		 *   <li>{@link Graphic#scale(float)} adjusts the size of the supplied value from the image
+		 *       scale to the view scale.
+		 *   <li>{@link Graphic#translateX(float)} and {@link Graphic#translateY(float)} adjust the
+		 *       coordinate from the image's coordinate system to the view coordinate system.
+		 * </ol>
+		 *
+		 * @param canvas drawing canvas
+		 */
+		public abstract void draw(Canvas canvas);
 
-        /** Returns the application context of the app. */
-        public Context getApplicationContext() {
-            return overlay.getContext().getApplicationContext();
-        }
+		public abstract void onTouch(Float x, Float y);
 
-        public boolean isImageFlipped() {
-            return overlay.isImageFlipped;
-        }
+		/**
+		 * Adjusts the supplied value from the image scale to the view scale.
+		 */
+		public float scale(float imagePixel) {
+			return imagePixel * overlay.scaleFactor;
+		}
 
-        /**
-         * Adjusts the x coordinate from the image's coordinate system to the view coordinate system.
-         */
-        public float translateX(float x) {
-            if (overlay.isImageFlipped) {
-                return overlay.getWidth() - (scale(x) - overlay.postScaleWidthOffset);
-            } else {
-                return scale(x) - overlay.postScaleWidthOffset;
-            }
-        }
+		/**
+		 * Returns the application context of the app.
+		 */
+		public Context getApplicationContext() {
+			return overlay.getContext().getApplicationContext();
+		}
 
-        /**
-         * Adjusts the y coordinate from the image's coordinate system to the view coordinate system.
-         */
-        public float translateY(float y) {
-            return scale(y) - overlay.postScaleHeightOffset;
-        }
+		public boolean isImageFlipped() {
+			return overlay.isImageFlipped;
+		}
 
-        /**
-         * Returns a {@link Matrix} for transforming from image coordinates to overlay view coordinates.
-         */
-        public Matrix getTransformationMatrix() {
-            return overlay.transformationMatrix;
-        }
+		/**
+		 * Adjusts the x coordinate from the image's coordinate system to the view coordinate system.
+		 */
+		public float translateX(float x) {
+			if (overlay.isImageFlipped) {
+				return overlay.getWidth() - (scale(x) - overlay.postScaleWidthOffset);
+			} else {
+				return scale(x) - overlay.postScaleWidthOffset;
+			}
+		}
 
-        public void postInvalidate() {
-            overlay.postInvalidate();
-        }
+		/**
+		 * Adjusts the y coordinate from the image's coordinate system to the view coordinate system.
+		 */
+		public float translateY(float y) {
+			return scale(y) - overlay.postScaleHeightOffset;
+		}
 
-        protected void setBlur() {
-            this.overlay.setAlpha(0.7f);
-        }
-    }
+		/**
+		 * Returns a {@link Matrix} for transforming from image coordinates to overlay view coordinates.
+		 */
+		public Matrix getTransformationMatrix() {
+			return overlay.transformationMatrix;
+		}
 
-    public GraphicOverlay(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        addOnLayoutChangeListener(
-                (view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) ->
-                        needUpdateTransformation = true);
-    }
+		public void postInvalidate() {
+			overlay.postInvalidate();
+		}
 
-    /** Removes all graphics from the overlay. */
-    public void clear() {
-        synchronized (lock) {
-            graphics.clear();
-        }
-        postInvalidate();
-    }
+		protected void setBlur() {
+			this.overlay.setAlpha(0.7f);
+		}
+	}
 
-    /** Adds a graphic to the overlay. */
-    public void add(Graphic graphic) {
-        synchronized (lock) {
-            graphics.add(graphic);
-        }
-    }
+	public GraphicOverlay(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		addOnLayoutChangeListener(
+			(view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) ->
+				needUpdateTransformation = true);
+	}
 
-    /** Removes a graphic from the overlay. */
-    public void remove(Graphic graphic) {
-        synchronized (lock) {
-            graphics.remove(graphic);
-        }
-        postInvalidate();
-    }
+	/**
+	 * Removes all graphics from the overlay.
+	 */
+	public void clear() {
+		synchronized (lock) {
+			graphics.clear();
+		}
+		postInvalidate();
+	}
 
-    /**
-     * Sets the source information of the image being processed by detectors, including size and
-     * whether it is flipped, which informs how to transform image coordinates later.
-     *
-     * @param imageWidth the width of the image sent to ML Kit detectors
-     * @param imageHeight the height of the image sent to ML Kit detectors
-     * @param isFlipped whether the image is flipped. Should set it to true when the image is from the
-     *     front camera.
-     */
-    public void setImageSourceInfo(int imageWidth, int imageHeight, boolean isFlipped) {
-        Preconditions.checkState(imageWidth > 0, "image width must be positive");
-        Preconditions.checkState(imageHeight > 0, "image height must be positive");
-        synchronized (lock) {
-            this.imageWidth = imageWidth;
-            this.imageHeight = imageHeight;
-            this.isImageFlipped = isFlipped;
-            needUpdateTransformation = true;
-        }
-        postInvalidate();
-    }
+	/**
+	 * Adds a graphic to the overlay.
+	 */
+	public void add(Graphic graphic) {
+		synchronized (lock) {
+			graphics.add(graphic);
+		}
+	}
 
-    public int getImageWidth() {
-        return imageWidth;
-    }
+	/**
+	 * Removes a graphic from the overlay.
+	 */
+	public void remove(Graphic graphic) {
+		synchronized (lock) {
+			graphics.remove(graphic);
+		}
+		postInvalidate();
+	}
 
-    public int getImageHeight() {
-        return imageHeight;
-    }
+	/**
+	 * Sets the source information of the image being processed by detectors, including size and whether it is flipped, which
+	 * informs how to transform image coordinates later.
+	 *
+	 * @param imageWidth the width of the image sent to ML Kit detectors
+	 * @param imageHeight the height of the image sent to ML Kit detectors
+	 * @param isFlipped whether the image is flipped. Should set it to true when the image is from the front camera.
+	 */
+	public void setImageSourceInfo(int imageWidth, int imageHeight, boolean isFlipped) {
+		Preconditions.checkState(imageWidth > 0, "image width must be positive");
+		Preconditions.checkState(imageHeight > 0, "image height must be positive");
+		synchronized (lock) {
+			this.imageWidth = imageWidth;
+			this.imageHeight = imageHeight;
+			this.isImageFlipped = isFlipped;
+			needUpdateTransformation = true;
+		}
+		postInvalidate();
+	}
 
-    private void updateTransformationIfNeeded() {
-        if (!needUpdateTransformation || imageWidth <= 0 || imageHeight <= 0) {
-            return;
-        }
-        float viewAspectRatio = (float) getWidth() / getHeight();
-        float imageAspectRatio = (float) imageWidth / imageHeight;
-        postScaleWidthOffset = 0;
-        postScaleHeightOffset = 0;
-        if (viewAspectRatio > imageAspectRatio) {
-            // The image needs to be vertically cropped to be displayed in this view.
-            scaleFactor = (float) getWidth() / imageWidth;
-            postScaleHeightOffset = ((float) getWidth() / imageAspectRatio - getHeight()) / 2;
-        } else {
-            // The image needs to be horizontally cropped to be displayed in this view.
-            scaleFactor = (float) getHeight() / imageHeight;
-            postScaleWidthOffset = ((float) getHeight() * imageAspectRatio - getWidth()) / 2;
-        }
+	public int getImageWidth() {
+		return imageWidth;
+	}
 
-        transformationMatrix.reset();
-        transformationMatrix.setScale(scaleFactor, scaleFactor);
-        transformationMatrix.postTranslate(-postScaleWidthOffset, -postScaleHeightOffset);
+	public int getImageHeight() {
+		return imageHeight;
+	}
 
-        if (isImageFlipped) {
-            transformationMatrix.postScale(-1f, 1f, getWidth() / 2f, getHeight() / 2f);
-        }
+	private void updateTransformationIfNeeded() {
+		if (!needUpdateTransformation || imageWidth <= 0 || imageHeight <= 0) {
+			return;
+		}
+		float viewAspectRatio = (float) getWidth() / getHeight();
+		float imageAspectRatio = (float) imageWidth / imageHeight;
+		postScaleWidthOffset = 0;
+		postScaleHeightOffset = 0;
+		if (viewAspectRatio > imageAspectRatio) {
+			// The image needs to be vertically cropped to be displayed in this view.
+			scaleFactor = (float) getWidth() / imageWidth;
+			postScaleHeightOffset = ((float) getWidth() / imageAspectRatio - getHeight()) / 2;
+		} else {
+			// The image needs to be horizontally cropped to be displayed in this view.
+			scaleFactor = (float) getHeight() / imageHeight;
+			postScaleWidthOffset = ((float) getHeight() * imageAspectRatio - getWidth()) / 2;
+		}
 
-        needUpdateTransformation = false;
-    }
+		transformationMatrix.reset();
+		transformationMatrix.setScale(scaleFactor, scaleFactor);
+		transformationMatrix.postTranslate(-postScaleWidthOffset, -postScaleHeightOffset);
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        for (Graphic graphic : graphics) {
-            graphic.onTouch(event.getX(), event.getY());
-        }
-        return super.onTouchEvent(event);
-    }
+		if (isImageFlipped) {
+			transformationMatrix.postScale(-1f, 1f, getWidth() / 2f, getHeight() / 2f);
+		}
 
-    /** Draws the overlay with its associated graphic objects. */
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+		needUpdateTransformation = false;
+	}
 
-        synchronized (lock) {
-            updateTransformationIfNeeded();
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		for (Graphic graphic : graphics) {
+			graphic.onTouch(event.getX(), event.getY());
+		}
+		return super.onTouchEvent(event);
+	}
 
-            for (Graphic graphic : graphics) {
-                graphic.draw(canvas);
-            }
-        }
-    }
+	/**
+	 * Draws the overlay with its associated graphic objects.
+	 */
+	@Override
+	protected void onDraw(Canvas canvas) {
+		super.onDraw(canvas);
+
+		synchronized (lock) {
+			updateTransformationIfNeeded();
+
+			for (Graphic graphic : graphics) {
+				graphic.draw(canvas);
+			}
+		}
+	}
 }

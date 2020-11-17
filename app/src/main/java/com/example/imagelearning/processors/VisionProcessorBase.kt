@@ -40,7 +40,7 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
     }
 
     private var activityManager: ActivityManager =
-        context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     private val fpsTimer = Timer()
     private val executor = ScopedExecutor(TaskExecutors.MAIN_THREAD)
 
@@ -60,34 +60,37 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
     // To keep the latest images and its metadata.
     @GuardedBy("this")
     private var latestImage: ByteBuffer? = null
+
     @GuardedBy("this")
     private var latestImageMetaData: FrameMetadata? = null
+
     // To keep the images and metadata in process.
     @GuardedBy("this")
     private var processingImage: ByteBuffer? = null
+
     @GuardedBy("this")
     private var processingMetaData: FrameMetadata? = null
 
     init {
         fpsTimer.scheduleAtFixedRate(
-            object : TimerTask() {
-                override fun run() {
-                    framesPerSecond = frameProcessedInOneSecondInterval
-                    frameProcessedInOneSecondInterval = 0
-                }
-            },
-            0,
-            1000
+                object : TimerTask() {
+                    override fun run() {
+                        framesPerSecond = frameProcessedInOneSecondInterval
+                        frameProcessedInOneSecondInterval = 0
+                    }
+                },
+                0,
+                1000
         )
     }
 
     // -----------------Code for processing single still image----------------------------------------
     override fun processBitmap(bitmap: Bitmap?, graphicOverlay: GraphicOverlay) {
         requestDetectInImage(
-            InputImage.fromBitmap(bitmap!!, 0),
-            graphicOverlay, /* originalCameraImage= */
-            null, /* shouldShowFps= */
-            false
+                InputImage.fromBitmap(bitmap!!, 0),
+                graphicOverlay, /* originalCameraImage= */
+                null, /* shouldShowFps= */
+                false
         )
     }
 
@@ -103,15 +106,15 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
             bitmap = BitmapUtils.getBitmap(image)
         }
         requestDetectInImage(
-            InputImage.fromMediaImage(image.image!!, image.imageInfo.rotationDegrees),
-            graphicOverlay, /* originalCameraImage= */
-            bitmap, /* shouldShowFps= */
-            true
+                InputImage.fromMediaImage(image.image!!, image.imageInfo.rotationDegrees),
+                graphicOverlay, /* originalCameraImage= */
+                bitmap, /* shouldShowFps= */
+                true
         )
-            // When the image is from CameraX analysis use case, must call image.close() on received
-            // images when finished using them. Otherwise, new images may not be received or the camera
-            // may stall.
-            .addOnCompleteListener { image.close() }
+                // When the image is from CameraX analysis use case, must call image.close() on received
+                // images when finished using them. Otherwise, new images may not be received or the camera
+                // may stall.
+                .addOnCompleteListener { image.close() }
     }
 
     // -----------------Common processing logic-------------------------------------------------------
@@ -135,51 +138,51 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
                 Log.d(TAG, "Max latency is: $maxRunMs")
                 Log.d(TAG, "Min latency is: $minRunMs")
                 Log.d(
-                    TAG,
-                    "Num of Runs: " + numRuns + ", Avg latency is: " + totalRunMs / numRuns
+                        TAG,
+                        "Num of Runs: " + numRuns + ", Avg latency is: " + totalRunMs / numRuns
                 )
                 val mi = ActivityManager.MemoryInfo()
                 activityManager.getMemoryInfo(mi)
                 val availableMegs = mi.availMem / 0x100000L
                 Log.d(
-                    TAG,
-                    "Memory available in system: $availableMegs MB"
+                        TAG,
+                        "Memory available in system: $availableMegs MB"
                 )
             }
             graphicOverlay.clear()
             if (originalCameraImage != null) {
                 graphicOverlay.add(
-                    CameraImageGraphic(
-                        graphicOverlay,
-                        originalCameraImage
-                    )
+                        CameraImageGraphic(
+                                graphicOverlay,
+                                originalCameraImage
+                        )
                 )
             }
             graphicOverlay.add(
-                InferenceInfoGraphic(
-                    graphicOverlay,
-                    currentLatencyMs.toDouble(),
-                    if (shouldShowFps) framesPerSecond else null
-                )
+                    InferenceInfoGraphic(
+                            graphicOverlay,
+                            currentLatencyMs.toDouble(),
+                            if (shouldShowFps) framesPerSecond else null
+                    )
             )
             this@VisionProcessorBase.onSuccess(results, graphicOverlay)
             graphicOverlay.postInvalidate()
         }
-            .addOnFailureListener(executor) { e: Exception ->
-                graphicOverlay.clear()
-                graphicOverlay.postInvalidate()
-                Toast.makeText(
-                    graphicOverlay.context,
-                    "Failed to process.\nError: " +
-                            e.localizedMessage +
-                            "\nCause: " +
-                            e.cause,
-                    Toast.LENGTH_LONG
-                )
-                    .show()
-                e.printStackTrace()
-                this@VisionProcessorBase.onFailure(e)
-            }
+                .addOnFailureListener(executor) { e: Exception ->
+                    graphicOverlay.clear()
+                    graphicOverlay.postInvalidate()
+                    Toast.makeText(
+                            graphicOverlay.context,
+                            "Failed to process.\nError: " +
+                                    e.localizedMessage +
+                                    "\nCause: " +
+                                    e.cause,
+                            Toast.LENGTH_LONG
+                    )
+                            .show()
+                    e.printStackTrace()
+                    this@VisionProcessorBase.onFailure(e)
+                }
     }
 
     override fun stop() {
