@@ -19,10 +19,11 @@ import java.nio.ByteBuffer
 
 /** A processor to run object detector.  */
 class ObjectDetectorProcessor(context: Context, options: ObjectDetectorOptionsBase) :
-        VisionProcessorBase<List<DetectedObject>>(context) {
+    VisionProcessorBase<List<DetectedObject>>(context) {
 
     private val detector: ObjectDetector = ObjectDetection.getClient(options)
-    private val imageLabeler: ImageLabeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
+    private val imageLabeler: ImageLabeler =
+        ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
 
 
     override fun stop() {
@@ -31,9 +32,9 @@ class ObjectDetectorProcessor(context: Context, options: ObjectDetectorOptionsBa
             detector.close()
         } catch (e: IOException) {
             Log.e(
-                    TAG,
-                    "Exception thrown while trying to close object detector!",
-                    e
+                TAG,
+                "Exception thrown while trying to close object detector!",
+                e
             )
         }
     }
@@ -54,9 +55,9 @@ class ObjectDetectorProcessor(context: Context, options: ObjectDetectorOptionsBa
     }
 
     override fun processByteBuffer(
-            data: ByteBuffer?,
-            frameMetadata: FrameMetadata?,
-            graphicOverlay: GraphicOverlay?
+        data: ByteBuffer?,
+        frameMetadata: FrameMetadata?,
+        graphicOverlay: GraphicOverlay?
     ) {
         TODO("Not yet implemented")
     }

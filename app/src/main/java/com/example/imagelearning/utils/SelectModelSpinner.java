@@ -9,7 +9,7 @@ import android.widget.ImageView;
 
 import com.example.imagelearning.R;
 
-public class SelectModelSpinner extends androidx.appcompat.widget.AppCompatSpinner implements View.OnClickListener{
+public class SelectModelSpinner extends androidx.appcompat.widget.AppCompatSpinner implements View.OnClickListener {
     private ImageView icon;
     private final Animation rotateToZero = AnimationUtils.loadAnimation(getContext(), R.anim.rotation_to_0);
     private final Animation rotateToPi = AnimationUtils.loadAnimation(getContext(), R.anim.rotation_to_180);
@@ -47,7 +47,7 @@ public class SelectModelSpinner extends androidx.appcompat.widget.AppCompatSpinn
     }
 
     @Override
-    public void onWindowFocusChanged (boolean hasFocus) {
+    public void onWindowFocusChanged(boolean hasFocus) {
         if (hasBeenOpened() && hasFocus) {
             performClosedEvent();
         }

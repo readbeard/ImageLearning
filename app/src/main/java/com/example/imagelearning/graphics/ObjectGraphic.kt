@@ -74,7 +74,7 @@ class ObjectGraphic constructor(
 
     override fun onTouch(x: Float, y: Float) {
         if (rect.contains(x, y)) {
-            super.setBlur()
+            //TODO: implement here logic to show bottomsheet
         }
     }
 

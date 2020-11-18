@@ -15,7 +15,6 @@ import com.example.imagelearning.utils.FrameMetadata
 import com.example.imagelearning.utils.ScopedExecutor
 import com.example.imagelearning.graphics.CameraImageGraphic
 import com.example.imagelearning.graphics.GraphicOverlay
-import com.example.imagelearning.graphics.InferenceInfoGraphic
 import com.example.imagelearning.utils.BitmapUtils
 import com.example.imagelearning.utils.PreferenceUtils
 import com.google.android.gms.tasks.Task
@@ -84,7 +83,7 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
         )
     }
 
-    // -----------------Code for processing single still image----------------------------------------
+    // -----------------Code for processing single still image-------------------------------------
     override fun processBitmap(bitmap: Bitmap?, graphicOverlay: GraphicOverlay) {
         requestDetectInImage(
                 InputImage.fromBitmap(bitmap!!, 0),
@@ -94,7 +93,7 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
         )
     }
 
-    // -----------------Code for processing live preview frame from CameraX API-----------------------
+    // -----------------Code for processing live preview frame from CameraX API--------------------
     @RequiresApi(VERSION_CODES.KITKAT)
     @ExperimentalGetImage
     override fun processImageProxy(image: ImageProxy, graphicOverlay: GraphicOverlay) {
@@ -111,13 +110,13 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
                 bitmap, /* shouldShowFps= */
                 true
         )
-                // When the image is from CameraX analysis use case, must call image.close() on received
-                // images when finished using them. Otherwise, new images may not be received or the camera
-                // may stall.
+                // When the image is from CameraX analysis use case, must call image.close()
+                // on received images when finished using them. Otherwise, new images may
+                // not be received or the camera may stall.
                 .addOnCompleteListener { image.close() }
     }
 
-    // -----------------Common processing logic-------------------------------------------------------
+    // -----------------Common processing logic----------------------------------------------------
     private fun requestDetectInImage(
             image: InputImage,
             graphicOverlay: GraphicOverlay,
@@ -158,14 +157,9 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
                         )
                 )
             }
-            graphicOverlay.add(
-                    InferenceInfoGraphic(
-                            graphicOverlay,
-                            currentLatencyMs.toDouble(),
-                            if (shouldShowFps) framesPerSecond else null
-                    )
-            )
+
             this@VisionProcessorBase.onSuccess(results, graphicOverlay)
+
             graphicOverlay.postInvalidate()
         }
                 .addOnFailureListener(executor) { e: Exception ->

@@ -21,7 +21,5 @@ public class CameraImageGraphic extends GraphicOverlay.Graphic {
 	}
 
 	@Override
-	public void onTouch(Float x, Float y) {
-		//TODO: to implement
-	}
+	public void onTouch(Float x, Float y) {}
 }

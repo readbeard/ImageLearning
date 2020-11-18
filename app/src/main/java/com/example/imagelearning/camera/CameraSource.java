@@ -224,16 +224,12 @@ public class CameraSource {
 		this.facing = facing;
 	}
 
-	/**
-	 * Returns the preview size that is currently in use by the underlying camera.
-	 */
+	/** Returns the preview size that is currently in use by the underlying camera.*/
 	public Size getPreviewSize() {
 		return previewSize;
 	}
 
-	/**
-	 * Returns the selected camera; one of {@link #CAMERA_FACING_BACK} or {@link #CAMERA_FACING_FRONT}.
-	 */
+	/** Returns the selected camera; one of {@link #CAMERA_FACING_BACK} or {@link #CAMERA_FACING_FRONT}.*/
 	public int getCameraFacing() {
 		return facing;
 	}
@@ -339,9 +335,9 @@ public class CameraSource {
 	/**
 	 * Selects the most suitable preview and picture size, given the desired width and height.
 	 *
-	 * <p>Even though we only need to find the preview size, it's necessary to find both the preview
-	 * size and the picture size of the camera together, because these need to have the same aspect ratio. On some hardware, if
-	 * you would only set the preview size, you will get a distorted image.
+	 * Even though we only need to find the preview size, it's necessary to find both the preview
+	 * size and the picture size of the camera together, because these need to have the same aspect ratio.
+	 * On some hardware, if you would only set the preview size, you will get a distorted image.
 	 *
 	 * @param camera the camera to select a preview size from
 	 * @param desiredWidth the desired width of the camera preview frames
@@ -372,9 +368,9 @@ public class CameraSource {
 
 	/**
 	 * Stores a preview size and a corresponding same-aspect-ratio picture size. To avoid distorted preview images on some
-	 * devices, the picture size must be set to a size that is the same aspect ratio as the preview size or the preview may end up
-	 * being distorted. If the picture size is null, then there is no picture size with the same aspect ratio as the preview
-	 * size.
+	 * devices, the picture size must be set to a size that is the same aspect ratio as the preview size or the preview may
+	 * end up being distorted. If the picture size is null, then there is no picture size with the same aspect ratio
+	 * as the preview size.
 	 */
 	public static class SizePair {
 
@@ -394,11 +390,11 @@ public class CameraSource {
 	}
 
 	/**
-	 * Generates a list of acceptable preview sizes. Preview sizes are not acceptable if there is not a corresponding picture size
-	 * of the same aspect ratio. If there is a corresponding picture size of the same aspect ratio, the picture size is paired up
-	 * with the preview size.
+	 * Generates a list of acceptable preview sizes. Preview sizes are not acceptable if there is not a corresponding
+	 * picture size of the same aspect ratio. If there is a corresponding picture size of the same aspect ratio,
+	 * the picture size is paired up with the preview size.
 	 *
-	 * <p>This is necessary because even if we don't use still pictures, the still picture size must
+	 * This is necessary because even if we don't use still pictures, the still picture size must
 	 * be set to a size that is the same aspect ratio as the preview size we choose. Otherwise, the preview images may be
 	 * distorted on some devices.
 	 */
