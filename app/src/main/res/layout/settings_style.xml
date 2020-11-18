@@ -5,4 +5,4 @@
     android:layout_height="wrap_content"
     android:padding="12dp"
     android:contentDescription="menu"
-    android:src="@drawable/common_google_signin_btn_icon_dark"/>
+    android:src="@drawable/ic_baseline_settings_24"/>

@@ -3,17 +3,14 @@ package com.example.imagelearning
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -22,6 +19,7 @@ import com.example.imagelearning.graphics.GraphicOverlay
 import com.example.imagelearning.processors.ObjectDetectorProcessor
 import com.example.imagelearning.processors.VisionImageProcessor
 import com.example.imagelearning.utils.PreferenceUtils
+import com.example.imagelearning.utils.SelectModelSpinner
 import com.example.imagelearning.viewmodels.CameraXViewModel
 import com.google.mlkit.common.MlKitException
 import com.google.mlkit.common.model.LocalModel
@@ -63,7 +61,7 @@ class MainActivity : AppCompatActivity(),
 
         graphicOverlay = findViewById(R.id.graphic_overlay)
 
-        val spinner = findViewById<Spinner>(R.id.mainactivity_mlmodel_spinner)
+        val spinner = findViewById<Spinner>(R.id.mainactivity_mlmodel_spinner) as SelectModelSpinner
         val options: MutableList<String> = ArrayList()
         options.add(OBJECT_DETECTION_CUSTOM)
 
@@ -74,6 +72,8 @@ class MainActivity : AppCompatActivity(),
         // attaching data adapter to spinner
         spinner.adapter = dataAdapter
         spinner.onItemSelectedListener = this
+        spinner.icon = findViewById<ImageView>(R.id.imageview_mainactivity_spinnericon)
+
         val facingSwitch = findViewById<ToggleButton>(R.id.togglebutton_mainactivity_facingswitch)
         facingSwitch.setOnCheckedChangeListener(this)
         ViewModelProvider(

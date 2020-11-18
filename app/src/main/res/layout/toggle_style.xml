@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="wrap_content" android:layout_width="wrap_content">
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:enterFadeDuration="@android:integer/config_shortAnimTime"
+    android:exitFadeDuration="@android:integer/config_shortAnimTime">
     <item
-        android:drawable="@drawable/common_google_signin_btn_icon_dark"
+        android:drawable="@drawable/ic_baseline_camera_front_24"
         android:state_checked="true"/>
     <item
-        android:drawable="@drawable/common_google_signin_btn_icon_dark"
+        android:drawable="@drawable/ic_baseline_camera_rear_24"
         android:state_checked="false"/>
 </selector>
