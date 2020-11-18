@@ -3,14 +3,17 @@ package com.example.imagelearning
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -41,6 +44,7 @@ class MainActivity : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         if (savedInstanceState != null) {
             selectedModel =
                     savedInstanceState.getString(
@@ -59,7 +63,7 @@ class MainActivity : AppCompatActivity(),
 
         graphicOverlay = findViewById(R.id.graphic_overlay)
 
-        val spinner = findViewById<Spinner>(R.id.spinner)
+        val spinner = findViewById<Spinner>(R.id.mainactivity_mlmodel_spinner)
         val options: MutableList<String> = ArrayList()
         options.add(OBJECT_DETECTION_CUSTOM)
 
@@ -70,7 +74,7 @@ class MainActivity : AppCompatActivity(),
         // attaching data adapter to spinner
         spinner.adapter = dataAdapter
         spinner.onItemSelectedListener = this
-        val facingSwitch = findViewById<ToggleButton>(R.id.facing_switch)
+        val facingSwitch = findViewById<ToggleButton>(R.id.togglebutton_mainactivity_facingswitch)
         facingSwitch.setOnCheckedChangeListener(this)
         ViewModelProvider(
                 this,
@@ -110,6 +114,7 @@ class MainActivity : AppCompatActivity(),
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
         // Do nothing.
+        Log.d(TAG, "No model selected")
     }
 
     override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
