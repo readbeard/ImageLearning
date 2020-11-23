@@ -2,14 +2,11 @@ package com.example.imagelearning.processors
 
 import android.content.Context
 import android.util.Log
-import com.example.imagelearning.utils.FrameMetadata
 import com.example.imagelearning.graphics.GraphicOverlay
 import com.example.imagelearning.graphics.ObjectGraphic
+import com.example.imagelearning.utils.FrameMetadata
 import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.label.ImageLabeler
-import com.google.mlkit.vision.label.ImageLabeling
-import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 import com.google.mlkit.vision.objects.DetectedObject
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.ObjectDetector
@@ -22,9 +19,6 @@ class ObjectDetectorProcessor(context: Context, options: ObjectDetectorOptionsBa
     VisionProcessorBase<List<DetectedObject>>(context) {
 
     private val detector: ObjectDetector = ObjectDetection.getClient(options)
-    private val imageLabeler: ImageLabeler =
-        ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
-
 
     override fun stop() {
         super.stop()
@@ -40,7 +34,6 @@ class ObjectDetectorProcessor(context: Context, options: ObjectDetectorOptionsBa
     }
 
     override fun detectInImage(image: InputImage): Task<List<DetectedObject>> {
-        imageLabeler.process(image)
         return detector.process(image)
     }
 
