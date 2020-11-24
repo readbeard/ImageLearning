@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -21,8 +22,11 @@ import com.example.imagelearning.processors.VisionImageProcessor
 import com.example.imagelearning.utils.PreferenceUtils
 import com.example.imagelearning.utils.SelectModelSpinner
 import com.example.imagelearning.viewmodels.CameraXViewModel
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.mlkit.common.MlKitException
 import com.google.mlkit.common.model.LocalModel
+import com.google.mlkit.vision.objects.DetectedObject
+
 
 class MainActivity : AppCompatActivity(),
         ActivityCompat.OnRequestPermissionsResultCallback,
@@ -95,6 +99,10 @@ class MainActivity : AppCompatActivity(),
         if (!allPermissionsGranted()) {
             runtimePermissions
         }
+
+        activity = this
+        companionLayoutInflater = layoutInflater
+
     }
 
     override fun onSaveInstanceState(bundle: Bundle) {
@@ -348,11 +356,14 @@ class MainActivity : AppCompatActivity(),
     }
 
     companion object {
+        private lateinit var activity: MainActivity
+        private lateinit var companionLayoutInflater: LayoutInflater
         private const val TAG = "CameraXLivePreview"
         private const val PERMISSION_REQUESTS = 1
         private const val OBJECT_DETECTION_CUSTOM = "Custom Object Detection"
         private const val STATE_SELECTED_MODEL = "selected_model"
         private const val STATE_LENS_FACING = "lens_facing"
+
 
         private fun isPermissionGranted(
             context: Context,
@@ -366,6 +377,22 @@ class MainActivity : AppCompatActivity(),
             }
             Log.i(TAG, "Permission NOT granted: $permission")
             return false
+        }
+
+        fun showBottomSheet(detectedObject: DetectedObject) {
+            val view: View = View.inflate(activity, R.layout.bottomsheetdialog, null)
+            val dialog = BottomSheetDialog(activity)
+
+            activity.imageProcessor?.run { this.stop() }
+
+            dialog.setContentView(view)
+
+            dialog.findViewById<TextView>(R.id.textview_bottomsheet_detectedword)?.text =
+                detectedObject.labels[0].text
+
+            dialog.setOnDismissListener({ activity.imageProcessor?.run { activity.bindAllCameraUseCases() }})
+
+            dialog.show()
         }
     }
 }

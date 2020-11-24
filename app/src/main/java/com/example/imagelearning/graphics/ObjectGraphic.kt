@@ -1,6 +1,10 @@
 package com.example.imagelearning.graphics
 
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.RectF
+import com.example.imagelearning.MainActivity
 import com.google.mlkit.vision.objects.DetectedObject
 import kotlin.math.abs
 import kotlin.math.max
@@ -74,7 +78,7 @@ class ObjectGraphic constructor(
 
     override fun onTouch(x: Float, y: Float) {
         if (rect.contains(x, y)) {
-            //TODO: implement here logic to show bottomsheet
+            MainActivity.showBottomSheet(detectedObject);
         }
     }
 
