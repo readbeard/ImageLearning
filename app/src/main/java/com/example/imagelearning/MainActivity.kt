@@ -21,10 +21,12 @@ import com.example.imagelearning.processors.ObjectDetectorProcessor
 import com.example.imagelearning.processors.VisionImageProcessor
 import com.example.imagelearning.utils.PreferenceUtils
 import com.example.imagelearning.utils.SelectModelSpinner
+import com.example.imagelearning.utils.TranslationBottomSheetDialog
 import com.example.imagelearning.viewmodels.CameraXViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.mlkit.common.MlKitException
 import com.google.mlkit.common.model.LocalModel
+import com.google.mlkit.nl.translate.Translator
 import com.google.mlkit.vision.objects.DetectedObject
 
 
@@ -38,7 +40,7 @@ class MainActivity : AppCompatActivity(),
     private var cameraProvider: ProcessCameraProvider? = null
     private var previewUseCase: Preview? = null
     private var analysisUseCase: ImageAnalysis? = null
-    private var imageProcessor: VisionImageProcessor? = null
+    internal var imageProcessor: VisionImageProcessor? = null
     private var needUpdateGraphicOverlayImageSourceInfo = false
     private var selectedModel = OBJECT_DETECTION_CUSTOM
     private var lensFacing = CameraSelector.LENS_FACING_BACK
@@ -175,7 +177,7 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    private fun bindAllCameraUseCases() {
+    internal fun bindAllCameraUseCases() {
         if (cameraProvider != null) {
             // As required by CameraX API, unbinds all use cases before trying to re-bind any of them.
             cameraProvider!!.unbindAll()
@@ -356,14 +358,15 @@ class MainActivity : AppCompatActivity(),
     }
 
     companion object {
+        private lateinit var bottomSheetDialog: BottomSheetDialog
         private lateinit var activity: MainActivity
+        private lateinit var langTranslator: Translator
         private lateinit var companionLayoutInflater: LayoutInflater
         private const val TAG = "CameraXLivePreview"
         private const val PERMISSION_REQUESTS = 1
         private const val OBJECT_DETECTION_CUSTOM = "Custom Object Detection"
         private const val STATE_SELECTED_MODEL = "selected_model"
         private const val STATE_LENS_FACING = "lens_facing"
-
 
         private fun isPermissionGranted(
             context: Context,
@@ -380,19 +383,12 @@ class MainActivity : AppCompatActivity(),
         }
 
         fun showBottomSheet(detectedObject: DetectedObject) {
-            val view: View = View.inflate(activity, R.layout.bottomsheetdialog, null)
-            val dialog = BottomSheetDialog(activity)
-
-            activity.imageProcessor?.run { this.stop() }
-
-            dialog.setContentView(view)
-
-            dialog.findViewById<TextView>(R.id.textview_bottomsheet_detectedword)?.text =
-                detectedObject.labels[0].text
-
-            dialog.setOnDismissListener({ activity.imageProcessor?.run { activity.bindAllCameraUseCases() }})
-
-            dialog.show()
+            if (detectedObject.labels.isEmpty()) {
+                return
+            }
+            val detectedLabel = detectedObject.labels[0].text
+            TranslationBottomSheetDialog(activity, detectedLabel).show()
         }
+
     }
 }

@@ -23,14 +23,24 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:clickable="true"
-        android:text="ciao"
         android:gravity="center_horizontal"
         android:textSize="18sp" />
+    <TextView
+      android:id="@+id/textview_bottomsheet_translatedword"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/textview_bottomsheet_detectedword"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      android:background="?attr/selectableItemBackgroundBorderless"
+      android:clickable="true"
+      android:gravity="center_horizontal"
+      android:textSize="18sp" />
 
     <View
         android:layout_width="wrap_content"
         android:layout_height="80dp"
-        app:layout_constraintTop_toBottomOf="@id/textview_bottomsheet_detectedword"
+        app:layout_constraintTop_toBottomOf="@id/textview_bottomsheet_translatedword"
         app:layout_constraintStart_toStartOf="parent"
         android:background="@color/white"/>
 
