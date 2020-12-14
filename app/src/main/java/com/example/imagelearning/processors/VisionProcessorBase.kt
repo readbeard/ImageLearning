@@ -17,6 +17,7 @@ import com.example.imagelearning.graphics.CameraImageGraphic
 import com.example.imagelearning.graphics.GraphicOverlay
 import com.example.imagelearning.utils.BitmapUtils
 import com.example.imagelearning.utils.PreferenceUtils
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskExecutors
 import com.google.mlkit.vision.common.InputImage
@@ -35,7 +36,7 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
 
     companion object {
         const val MANUAL_TESTING_LOG = "LogTagForTest"
-        private const val TAG = "VisionProcessorBase"
+        private val TAG = VisionProcessorBase::class.simpleName
     }
 
     private var activityManager: ActivityManager =
@@ -177,6 +178,7 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
                     e.printStackTrace()
                     this@VisionProcessorBase.onFailure(e)
                 }
+
     }
 
     override fun stop() {

@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.TextView
 import com.example.imagelearning.MainActivity
 import com.example.imagelearning.R
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.translate.TranslateLanguage

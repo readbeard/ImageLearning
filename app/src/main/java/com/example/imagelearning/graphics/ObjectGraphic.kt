@@ -42,7 +42,9 @@ class ObjectGraphic constructor(
         val colorID =
                 if (detectedObject.trackingId == null) 0
                 else abs(detectedObject.trackingId!! % NUM_COLORS)
-        val mostConfidentResult = detectedObject.labels[0].text
+
+
+        val mostConfidentResult = if (detectedObject.labels.isEmpty()) detectedObject.trackingId.toString() else detectedObject.labels[0].text
         val textWidth =
                 textPaints[colorID].measureText(mostConfidentResult)
         val lineHeight = TEXT_SIZE + STROKE_WIDTH

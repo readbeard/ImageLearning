@@ -56,6 +56,6 @@ class ObjectDetectorProcessor(context: Context, options: ObjectDetectorOptionsBa
     }
 
     companion object {
-        private const val TAG = "ObjectDetectorProcessor"
+        private val TAG = ObjectDetectorProcessor::class.simpleName
     }
 }
